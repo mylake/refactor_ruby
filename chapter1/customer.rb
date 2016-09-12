@@ -11,34 +11,25 @@ class Customer
   end
 
   def statement
-    total_amount, frequent_render_points = 0, 0
+    frequent_render_points = 0
     result = "Rental Record for #{@name}\n"
     @rentals.each do |element|
-      this_amount = 0
+      frequent_render_points += element.frequent_render_points
 
-      case element.movie.price_code
-      when Movie::REGULAR
-        this_amount += 2
-        this_amount += (element.days_rented -2) * 1.5 if element.days_rented > 2
-      when Movie::NEW_RELEASE
-        this_amount += element.days_rented * 3
-      when Movie::CHILDRENS
-        this_amount += 1.5
-        this_amount += (element.days_rented -3) * 1.5 if element.days_rented > 3
-      end
-
-      frequent_render_points += 1
-
-      if element.movie.price_code == Movie.NEW_RELEASE && element.days_rented > 1
-        frequent_render_points += 1
-      end
-
-      result += '\t' + element.movie.title + '\t' + this_amount.to_s + '\n'
-      total_amount += this_amount
+      result += '\t' + element.movie.title + '\t' + element.charge.to_s + '\n'
     end
 
-    result += "Amount owned is #{total_amount}\n"
-    result += "You earned #{frequent_render_points} frequent renter points"
+    result += "Amount owned is #{total_charge}\n"
+    result += "You earned #{total_frequent_render_points} frequent renter points"
     result
   end
+
+  def total_charge
+    @rentals.inject(0) { |sum, rental| sum + rental.charge }
+  end
+
+  def total_frequent_render_points
+    @rental.inject(0) { |sum, rental| sum + rental.frequent_render_points }
+  end
+
 end
